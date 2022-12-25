@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>JPDB Illustration for insertion of Books record</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="index.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="form">
+            <h2 class="heading">New Book Record Insertion</h2>
+            <form id="empForm" method="post">
+                <div class="form-group">
+                    <input type="text" class="form-control" name="Bookid" id="Bookid" placeholder="Enter Book ID"
+                        required>
+                    <input type="text" class="form-control" id="BookName" placeholder="Enter Book Name" name="BookName">
+                    <input type="email" class="form-control" id="Booktype" placeholder="Enter Book Type"
+                        name="Booktype">
+                    <input type="text" class="form-control" name="Authorname" id="Authorname"
+                        placeholder="Enter Author Name" required>
+                    <input type="text" class="form-control" name="Publisheddate" id="Publisheddate"
+                        placeholder="Enter Published Date" required>
+                    <input type="text" class="form-control" name="Unitsavailable" id="Unitsavailable"
+                        placeholder="Enter Units Available" required>
+                </div>
+                <input type="button" id="empSave" value="INSERT RECORD"
+                    onclick="insertrecord();">
+            </form>
+        </div>
+    </div>
+    <script>
+        $("#Studentid").focus();
+        function validateAndGetFormData() {
+            var BookidVar = $("#Bookid").val();
+            if (BookidVar === "") {
+                alert("Book ID Required Value");
+                $("#Bookid").focus();
+                return "";
+            }
+            var BookNameVar = $("#BookName").val();
+            if (BookNameVar === "") {
+                alert("Book Name is Required Value");
+                $("#BookName").focus();
+                return "";
+            }
+            var BooktypeVar = $("#Booktype").val();
+            if (BooktypeVar === "") {
+                alert("Book type is Required Value");
+                $("#Booktype").focus();
+                return "";
+            }
+            var AuthornameVar = $("#Authorname").val();
+            if (AuthornameVar === "") {
+                alert("Author name Required Value");
+                $("#Authorname").focus();
+                return "";
+            }
+            var PublisheddateVar = $("#Publisheddate").val();
+            if (PublisheddateVar === "") {
+                alert("Published date is Required Value");
+                $("#Publisheddate").focus();
+                return "";
+            }
+            var UnitsavailableVar = $("#Unitsavailable").val();
+            if (UnitsavailableVar === "") {
+                alert("Units available is Required Value");
+                $("#Unitsavailable").focus();
+                return "";
+            }
+
+            var jsonStrObj = {
+                Bookid: BookidVar,
+                BookName: BookNameVar,
+                Booktype: BooktypeVar,
+                Authorname: AuthornameVar,
+                Publisheddate: PublisheddateVar,
+                Unitsavailable: UnitsavailableVar,
+            };
+            return JSON.stringify(jsonStrObj);
+        }
+        function createPUTRequest(connToken, jsonObj, dbName, relName) {
+            var putRequest = "{\n"
+                + "\"token\" : \""
+                + connToken
+                + "\","
+                + "\"dbName\": \""
+                + dbName
+                + "\",\n" + "\"cmd\" : \"PUT\",\n"
+                + "\"rel\" : \""
+                + relName + "\","
+                + "\"jsonStr\": \n"
+                + jsonObj
+                + "\n"
+                + "}";
+            return putRequest;
+        }
+        function executeCommand(reqString, dbBaseUrl, apiEndPointUrl) {
+            var url = dbBaseUrl + apiEndPointUrl;
+            var jsonObj;
+            $.post(url, reqString, function (result) {
+                jsonObj = JSON.parse(result);
+            }).fail(function (result) {
+                var dataJsonObj = result.responseText;
+                jsonObj = JSON.parse(dataJsonObj);
+            });
+            return jsonObj;
+        }
+        function resetForm() {
+            $("#Bookid").val("")
+            $("#BookName").val("");
+            $("#Booktype").val("")
+            $("#Authorname").val("");
+            $("#Publisheddate").val("");
+            $("#Unitsavailable").val("");
+            $("#Studentid").focus();
+        }
+        function insertrecord() {
+            var jsonStr = validateAndGetFormData();
+            if (jsonStr === "") {
+                return;
+            }
+            var putReqStr = createPUTRequest("90938292|-31949273866009382|90952226",
+                jsonStr, "Books", "Books_registration");
+            alert(putReqStr);
+            jQuery.ajaxSetup({ async: false });
+            var resultObj = executeCommand(putReqStr,
+                "http://api.login2explore.com:5577", "/api/iml");
+            alert(JSON.stringify(resultObj));
+            jQuery.ajaxSetup({ async: true });
+            resetForm();
+        }
+    </script>
+</body>
+
+</html>
